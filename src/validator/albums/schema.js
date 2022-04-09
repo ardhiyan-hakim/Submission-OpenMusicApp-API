@@ -5,4 +5,4 @@ const AlbumPayloadSchema = Joi.object({
   year: Joi.string().reqruied(),
 });
 
-module.exports = AlbumPayloadSchema;
+module.exports = { AlbumPayloadSchema };
