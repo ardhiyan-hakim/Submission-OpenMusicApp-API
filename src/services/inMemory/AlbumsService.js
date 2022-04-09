@@ -1,4 +1,6 @@
 const { nanoid } = require('nanoid');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class AlbumsService {
   constructor() {
@@ -16,7 +18,7 @@ class AlbumsService {
     const success = this._albums.filter((album) => album.id === id).length > 0;
 
     if (!success) {
-      throw new Error('Album tidak berhasil ditambahkan');
+      throw new InvariantError('Album tidak berhasil ditambahkan');
     }
 
     return id;
@@ -30,7 +32,7 @@ class AlbumsService {
     const album = this._albums((itemAlbum) => itemAlbum.id === id)[0];
 
     if (!album) {
-      throw new Error('Album tidak ditemukan');
+      throw new NotFoundError('Album tidak ditemukan');
     }
 
     return album;
@@ -39,7 +41,7 @@ class AlbumsService {
   editAlbumById(id, { name, year }) {
     const index = this._albums.findIndex((album) => album.id === id);
     if (index === -1) {
-      throw new Error('Album tidak berhasil diperbarui. Id tidak ditemukan');
+      throw new NotFoundError('Album tidak berhasil diperbarui. Id tidak ditemukan');
     }
 
     this._albums[index] = {
@@ -52,7 +54,7 @@ class AlbumsService {
   deleteAlbumById(id) {
     const index = this._albums.findIndex((album) => album.id === id);
     if (index === -1) {
-      throw new Error('Album tidak berhasil dihapus. Id tidak ditemukan');
+      throw new NotFoundError('Album tidak berhasil dihapus. Id tidak ditemukan');
     }
 
     this._albums.splice(index, 1);
