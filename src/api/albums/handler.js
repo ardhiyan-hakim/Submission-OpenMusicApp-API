@@ -134,4 +134,4 @@ class AlbumsHandler {
   }
 }
 
-module.export = AlbumsHandler;
+module.exports = AlbumsHandler;

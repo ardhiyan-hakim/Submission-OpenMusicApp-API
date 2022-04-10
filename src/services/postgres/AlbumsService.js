@@ -28,7 +28,7 @@ class AlbumsService {
   async getAlbums() {
     const result = await this._pool.query('SELECT * FROM albums');
 
-    return result.rows;
+    return result.rows[0];
   }
 
   async getAlbumById(id) {
@@ -61,7 +61,7 @@ class AlbumsService {
 
   async deleteAlbumById(id) {
     const query = {
-      text: 'DELETE FROM notes WHERE id = $1 RETURNING id',
+      text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
       values: [id],
     };
 
