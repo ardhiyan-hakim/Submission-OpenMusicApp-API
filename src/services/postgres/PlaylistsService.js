@@ -3,6 +3,7 @@ const { nanoid } = require('nanoid');
 
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
   constructor() {
@@ -50,7 +51,7 @@ class PlaylistsService {
     }
   }
 
-  async addSongToPlaylist(playlistId, songId) {
+  async addSongToPlaylistById(playlistId, songId) {
     const id = `{playlistSongs-${nanoid(16)}`;
     const query = {
       text: 'INSERT INTO playlists_songs VALUES($1, $2, $3) RETURNING id',
@@ -83,7 +84,7 @@ class PlaylistsService {
   }
 
   // Mendapatkan Data Songs pada Playlist tertentu (berdasarkan Id)
-  async getSongsInPlaylist(playlistId) {
+  async getSongsInPlaylistById(playlistId) {
     const query = {
       text: 'SELECT songs.id, songs.title, songs.performer FROM songs LEFT JOIN playlists_songs ON songs.id = playlists_songs.songid WHERE playlists_songs.playlistid = $1',
       values: [playlistId],
@@ -98,9 +99,9 @@ class PlaylistsService {
     return result.rows;
   }
 
-  async deleteSongFromPlaylist(playlistId, songId) {
+  async deleteSongFromPlaylistById(playlistId, songId) {
     const query = {
-      text: 'DELETE FROM playlists_song WHERE playlistid = $1 AND songid = $2',
+      text: 'DELETE FROM playlists_song WHERE playlistid = $1 AND songid = $2 RETURNING id',
       values: [playlistId, songId],
     };
 
@@ -108,6 +109,25 @@ class PlaylistsService {
 
     if (!result.rows.length) {
       throw new NotFoundError('Lagu pada playlist Anda gagal dihapus. Id lagu tidak ditemukan.');
+    }
+  }
+
+  async verifyPlaylistOwner({ playlistId, credentialId: owner }) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new InvariantError('Playlist tidak ditemukan');
+    }
+
+    const playlist = result.rows[0];
+
+    if (playlist.owner !== owner) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
 }
