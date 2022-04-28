@@ -36,7 +36,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query);
 
-    return result.rows[0];
+    return result.rows;
   }
 
   async deletePlaylistById(id) {
@@ -55,16 +55,15 @@ class PlaylistsService {
   async addSongToPlaylistById(playlistId, songId) {
     const id = `{playlistSongs-${nanoid(16)}`;
     const query = {
-      text: 'INSERT INTO playlists_songs VALUES($1, $2, $3) RETURNING id',
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
       values: [id, playlistId, songId],
     };
 
     const result = await this._pool.query(query);
 
     if (!result.rows[0].id) {
-      throw new InvariantError('Gagal menambahkan lagu ke dalam Playlist');
+      throw new NotFoundError('Gagal menambahkan lagu ke dalam Playlist');
     }
-
     return result.rows[0].id;
   }
 
@@ -81,13 +80,13 @@ class PlaylistsService {
       throw new NotFoundError('Playlist yang Anda cari tidak dapat ditemukan.');
     }
 
-    return result.rows;
+    return result.rows[0];
   }
 
   // Mendapatkan Data Songs pada Playlist tertentu (berdasarkan Id)
   async getSongsInPlaylistById(playlistId) {
     const query = {
-      text: 'SELECT songs.id, songs.title, songs.performer FROM songs LEFT JOIN playlists_songs ON songs.id = playlists_songs.songid WHERE playlists_songs.playlistid = $1',
+      text: 'SELECT songs.id, songs.title, songs.performer FROM songs LEFT JOIN playlist_songs ON songs.id = playlist_songs.songid WHERE playlist_songs.playlistid = $1',
       values: [playlistId],
     };
 
@@ -102,7 +101,7 @@ class PlaylistsService {
 
   async deleteSongFromPlaylistById(playlistId, songId) {
     const query = {
-      text: 'DELETE FROM playlists_song WHERE playlistid = $1 AND songid = $2 RETURNING id',
+      text: 'DELETE FROM playlist_songs WHERE playlistid = $1 AND songid = $2 RETURNING id',
       values: [playlistId, songId],
     };
 
@@ -122,7 +121,7 @@ class PlaylistsService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new InvariantError('Playlist tidak ditemukan');
+      throw new NotFoundError('Playlist tidak ditemukan');
     }
 
     const playlist = result.rows[0];
