@@ -20,11 +20,12 @@ class ExportsHandler {
       await this._playlistsService.getPlaylistById(playlistId);
 
       const message = {
+        playlistId,
         userId: request.auth.credentials.id,
-        targetEmail: request.payload.targetEmail,
+        targetEmail: 'request.payload.targetEmail',
       };
 
-      await this._ProducerService.sendMessage('export:songs', JSON.stringify(message));
+      await this._ProducerService.sendMessage('export:playlist', JSON.stringify(message));
 
       return h.response({
         status: 'success',
