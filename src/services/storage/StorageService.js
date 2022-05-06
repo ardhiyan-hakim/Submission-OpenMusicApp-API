@@ -13,14 +13,13 @@ class StorageService {
     }
   }
 
-  async insertCoverUrlToDatabase(albumId, coverUrl) {
+  async insertCoverUrlToDatabase(albumId, cover) {
     const query = {
-      text: 'UPDATE albums SET coverurl = $1 WHERE albums.id = $2 RETURNING id',
-      values: [coverUrl, albumId],
+      text: 'UPDATE albums SET cover = $1 WHERE albums.id = $2 RETURNING id',
+      values: [cover, albumId],
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows[0].id) {
       throw new InvariantError('Sampul tidak berhasil diunggah');
     }

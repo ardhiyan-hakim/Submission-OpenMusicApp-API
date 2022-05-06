@@ -22,4 +22,16 @@ const mapDBToModel = ({
   albumId: albumid,
 });
 
-module.exports = { mapDBToModel, mapDBToShortModel };
+const mapDBAlbumsModel = ({
+  id,
+  name,
+  year,
+  cover: coverUrl,
+}) => ({
+  id,
+  name,
+  year,
+  coverUrl,
+});
+
+module.exports = { mapDBToModel, mapDBToShortModel, mapDBAlbumsModel };
