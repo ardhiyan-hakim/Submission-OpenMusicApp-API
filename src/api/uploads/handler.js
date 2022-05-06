@@ -10,17 +10,19 @@ class UploadsHandler {
 
   async postUploadImageHandler(request, h) {
     try {
-      const { data } = request.payload;
+      const { cover: data } = request.payload;
+      const { id: albumId } = request.params;
+
       this._validator.validateImageHeaders(data.hapi.headers);
 
       const filename = await this._service.writeFile(data, data.hapi);
 
+      const coverUrl = `http://${process.env.HOST}:${process.env.PORT}/upload/images/${filename}`;
+      await this._service.insertCoverUrlToDatabase(albumId, coverUrl);
+
       return h.response({
         status: 'success',
         message: 'Sampul berhasil diunggah',
-        data: {
-          coverUrl: `http://${process.env.HOST}:${process.env.PORT}/upload/images/${filename}`,
-        },
       }).code(201);
     } catch (error) {
       if (error instanceof ClientError) {
