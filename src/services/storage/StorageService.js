@@ -1,12 +1,31 @@
 const fs = require('fs');
+const { Pool } = require('pg');
+
+const InvariantError = require('../../exceptions/InvariantError');
 
 class StorageService {
   constructor(folder) {
+    this._pool = new Pool();
     this._folder = folder;
 
     if (!fs.existsSync(folder)) {
       fs.mkdirSync(folder, { recursive: true });
     }
+  }
+
+  async insertCoverUrlToDatabase(albumId, coverUrl) {
+    const query = {
+      text: 'UPDATE albums SET coverurl = $1 WHERE albums.id = $2 RETURNING id',
+      values: [coverUrl, albumId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows[0].id) {
+      throw new InvariantError('Sampul tidak berhasil diunggah');
+    }
+
+    return result.rows[0].id;
   }
 
   writeFile(file, meta) {
