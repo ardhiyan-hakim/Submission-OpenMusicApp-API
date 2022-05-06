@@ -34,7 +34,7 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const query = {
-      text: 'SELECT * FROM albums WHERE id = $1',
+      text: 'SELECT id, name, year, cover FROM albums WHERE id = $1',
       values: [id],
     };
 
@@ -44,9 +44,7 @@ class AlbumsService {
       throw new NotFoundError('Album tidak ditemukan');
     }
 
-    const result = rows.map(mapDBAlbumsModel)[0];
-    console.log(result);
-    return result;
+    return rows[0];
   }
 
   async editAlbumById(id, { name, year }) {
