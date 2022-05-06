@@ -16,7 +16,7 @@ class UploadsHandler {
       this._validator.validateImageHeaders(data.hapi.headers);
       const filename = await this._service.writeFile(data, data.hapi);
 
-      const cover = `http://${process.env.HOST}:${process.env.PORT}/upload/images/${filename}`;
+      const cover = `http://${process.env.HOST}:${process.env.PORT}/uploads/images/${filename}`;
       await this._service.insertCoverUrlToDatabase(albumId, cover);
 
       return h.response({
