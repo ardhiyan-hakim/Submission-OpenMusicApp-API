@@ -64,7 +64,7 @@ class UserAlbumLikesService {
       throw new InvariantError('Gagal membatalkan album yang disukai. Id tidak ditemukan');
     }
 
-    await this._cacheService.delete(`user_album_likes:${albumId}`);
+    await this._cacheService.delete(`user_album_likes: ${albumId}`);
   }
 
   async verifyUserAlbumLikes(userId, albumId) {
